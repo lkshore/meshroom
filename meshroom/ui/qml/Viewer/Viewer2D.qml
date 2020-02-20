@@ -160,6 +160,29 @@ FocusScope {
                 })
             }
         }
+
+        Connections {
+            target: _reconstruction
+            onPanoramaInitChanged: console.warn("PanoramaInit: " + _reconstruction.panoramaInit)
+        }
+
+        // FisheyeCircleViewer: display fisheye circle
+        // note: use a Loader to evaluate if a PanoramaInit node exist and displayFisheyeCircle checked at runtime
+        Loader {
+            anchors.centerIn: parent
+            active: (_reconstruction.panoramaInit && displayFisheyeCircleLoader.item.checked)
+            sourceComponent: CircleGizmo {
+                x: _reconstruction.panoramaInit.attribute("fisheyeCenterOffset.x").value
+                y: _reconstruction.panoramaInit.attribute("fisheyeCenterOffset.y").value
+                radius: Math.min(imageViewerWrapper.currentImageViewer.width, imageViewerWrapper.currentImageViewer.height) * 0.5 * (_reconstruction.panoramaInit.attribute("fisheyeRadius").value * 0.01)
+                border.width: Math.max(1, (3.0 / imageViewerWrapper.scale))
+
+                onMoved: {
+                    _reconstruction.setAttribute(_reconstruction.panoramaInit.attribute("fisheyeCenterOffset.x"), x)
+                    _reconstruction.setAttribute(_reconstruction.panoramaInit.attribute("fisheyeCenterOffset.y"), y)
+                }
+            }
+        }
     }
 
     // Busy indicator
@@ -194,7 +217,7 @@ FocusScope {
         }
         onWheel: {
             var zoomFactor = wheel.angleDelta.y > 0 ? factor : 1/factor
-            if(Math.min(imageViewerWrapper.width*imageViewerWrapper.scale*zoomFactor, imageViewerWrapper.height*imageViewerWrapper.scale*zoomFactor) < 10)
+            if(Math.min(imageViewerWrapper.width, imageViewerWrapper.currentImageViewer.height) * imageViewerWrapper.scale * zoomFactor < 10)
                 return
             var point = mapToItem(imageViewerWrapper, wheel.x, wheel.y)
             imageViewerWrapper.x += (1-zoomFactor) * point.x * imageViewerWrapper.scale
@@ -203,7 +226,7 @@ FocusScope {
         }
     }
 
-    ColumnLayout {
+    FloatingPane {
         id: topToolbar
         anchors.top: parent.top
         anchors.margins: 0
@@ -321,6 +344,18 @@ FocusScope {
                 ToolTip.text: "Display Features"
                 checkable: true
                 text: MaterialIcons.scatter_plot
+            }
+
+            Loader {
+                id: displayFisheyeCircleLoader
+                active: _reconstruction.panoramaInit
+                sourceComponent: MaterialToolButton {
+                    font.pointSize: 11
+                    ToolTip.text: "Display Fisheye Circle"
+                    checkable: true
+                    checked: false
+                    text: MaterialIcons.panorama_fish_eye
+                }
             }
 
             Item {

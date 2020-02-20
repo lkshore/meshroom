@@ -394,6 +394,10 @@ class Reconstruction(UIGraph):
         # - Texturing
         self._texturing = None
 
+        # - PanoramaInit
+        self._panoramaInit = None
+        self.cameraInitChanged.connect(self.updatePanoramaInitNode)
+
         # react to internal graph changes to update those variables
         self.graphChanged.connect(self.onGraphChanged)
 
@@ -447,6 +451,7 @@ class Reconstruction(UIGraph):
         self.prepareDenseScene = None
         self.depthMap = None
         self.texturing = None
+        self.panoramaInit = None
         self.updateCameraInits()
         if not self._graph:
             return
@@ -490,6 +495,10 @@ class Reconstruction(UIGraph):
     def updateDepthMapNode(self):
         """ Set the current FeatureExtraction node based on the current CameraInit node. """
         self.depthMap = self.lastNodeOfType('DepthMapFilter', self.cameraInit) if self.cameraInit else None
+
+    def updatePanoramaInitNode(self):
+        """ Set the current FeatureExtraction node based on the current CameraInit node. """
+        self.panoramaInit = self.lastNodeOfType('PanoramaInit', self.cameraInit) if self.cameraInit else None
 
     def lastSfmNode(self):
         """ Retrieve the last SfM node from the initial CameraInit node. """
@@ -798,6 +807,8 @@ class Reconstruction(UIGraph):
             self.prepareDenseScene = node
         elif node.nodeType in ("DepthMap", "DepthMapFilter"):
             self.depthMap = node
+        elif node.nodeType == "PanoramaInit":
+            self.panoramaInit = node
 
     def updateSfMResults(self):
         """
@@ -967,6 +978,9 @@ class Reconstruction(UIGraph):
 
     texturingChanged = Signal()
     texturing = makeProperty(QObject, "_texturing", notify=texturingChanged)
+
+    panoramaInitChanged = Signal()
+    panoramaInit = makeProperty(QObject, "_panoramaInit", notify=panoramaInitChanged, resetOnDestroy=True)
 
     nbCameras = Property(int, reconstructedCamerasCount, notify=sfmReportChanged)
 
