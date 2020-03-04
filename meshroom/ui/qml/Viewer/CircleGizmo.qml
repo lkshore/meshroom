@@ -9,7 +9,7 @@ Rectangle {
     height: width
     color: "transparent"
     border.width: 5
-    border.color: "green"
+    border.color: "yellow"
 
     Behavior on x {
         NumberAnimation {
@@ -32,8 +32,8 @@ Rectangle {
     MouseArea {
         id: mArea
         anchors.fill: parent
-        cursorShape: Qt.OpenHandCursor;
-        acceptedButtons: Qt.LeftButton | Qt.RightButton
+        cursorShape: Qt.OpenHandCursor
+        acceptedButtons: Qt.LeftButton
         hoverEnabled: true
         drag.target: parent
 
