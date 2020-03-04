@@ -399,7 +399,7 @@ FocusScope {
                             flat: true
                             
                             property var types: ["image", "depth", "sim"]
-                            property string type: types[currentIndex]
+                            property string type: enabled ? types[currentIndex] : types[0]
 
                             model: types
                             enabled: _reconstruction.depthMap != undefined
