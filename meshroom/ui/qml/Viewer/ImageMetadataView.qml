@@ -143,17 +143,32 @@ FloatingPane {
                 filterValue: searchBar.text
                 delegate: RowLayout {
                     width: parent.width
-                    Label {
+                    TextField {
                         text: key
                         leftPadding: 6
                         rightPadding: 4
                         Layout.preferredWidth: sizeHandle.x
-                        elide: Text.ElideRight
+                        horizontalAlignment: TextInput.AlignLeft
+                        selectByMouse: true
+                        readOnly: true
+                        Component.onCompleted: {
+                            ensureVisible(0)
+                        }
+                        onWidthChanged: {
+                            ensureVisible(0)
+                        }
                     }
-                    Label {
+                    TextField {
                         text: value
                         Layout.fillWidth: true
-                        wrapMode: Label.WrapAtWordBoundaryOrAnywhere
+                        selectByMouse: true
+                        readOnly: true
+                        Component.onCompleted: {
+                            ensureVisible(0)
+                        }
+                        onWidthChanged: {
+                            ensureVisible(0)
+                        }
                     }
                 }
             }
